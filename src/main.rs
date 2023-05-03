@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn remove_comments(input: &str) -> String {
     let mut output = String::new();
     let mut lines = input.lines();
@@ -32,5 +34,46 @@ mod tests {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let input = "addi    $sp,    $sp,    -4\n main : sw      $ra,    0($sp)";
+    let converted = parse_asm(input);
+    println!("{:?}", converted);
+}
+
+type LabelMap = HashMap<String, usize>;
+type Operation = Vec<String>;
+
+fn parse_asm(input: &str) -> (Vec<Operation>, LabelMap) {
+    let mut label_map = HashMap::new();
+    let operations = input
+        .lines()
+        // Trim whitespaces and remove empty lines
+        .filter_map(|line| {
+            let text = line.trim();
+            if text.is_empty() {
+                None
+            } else {
+                Some(text)
+            }
+        })
+        .enumerate()
+        .map(|(i, text)| {
+            // Read labels and set them in the label_map
+            // Convert to an operation iterator
+            if let Some((label, operation)) = text.split_once(":") {
+                label_map.insert(label.trim().to_owned(), i);
+                operation
+            } else {
+                text
+            }
+        })
+        .map(|s| {
+            // Split the operation
+            s.split(|c: char| c == ',' || c.is_whitespace())
+                .filter(|s| !s.trim().is_empty())
+                .map(|s| s.trim().to_owned())
+                .collect()
+        })
+        .collect();
+
+    (operations, label_map)
 }
