@@ -11,6 +11,9 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
 
     match opcode {
         "add" => {
+            // 0: Add
+            // add rd,rs,rt
+            // type R
             let rd: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("add", "rd")))?
@@ -32,6 +35,9 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
             }))
         }
         "addi" => {
+            // 1: Add Immidiate
+            // addi rt,rs,imm
+            // type I
             let rt: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("addi", "rt")))?
@@ -53,7 +59,62 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
                 imm,
             }))
         }
-        // TODO: implement instructions
+        "lw" => {
+            // 2: Load Word
+            // lw rt addr(rs)
+            // type I
+            //
+            // Consider: addr(rs)
+            todo!()
+        }
+        "sw" => {
+            // 3: Store Word
+            // sw rt addr(rs)
+            // type I
+            //
+            // Consider: addr(rs)
+            todo!()
+        }
+        "beq" => {
+            // 4: Branch on Equal
+            // beq rs,rt,addr
+            // type I
+            //
+            // Consider: labels
+            todo!()
+        }
+        "j" => {
+            // 5: Jump
+            // j addr
+            // type J
+            //
+            // Consider: labels
+            todo!()
+        }
+        "jal" => {
+            // 6: Jump and Link
+            // jal addr
+            // type J
+            //
+            // Consider: labels
+            todo!()
+        }
+        "jr" => {
+            // 7: Jump Register
+            // jr rs
+            // type R
+            let rs: Register = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("jr", "rs")))?
+                .try_into()?;
+
+            Ok(Box::new(RTypeInstruction {
+                opcode: Opcode::new(0, opcode),
+                rs,
+                rt: Register::default(),
+                rd: Register::default(),
+            }))
+        }
         _ => Err(anyhow!(
             "Unsupported instruction encounted: `{}` is not supported.",
             opcode
@@ -88,6 +149,7 @@ impl IntoBinaryFormat for RTypeInstruction {
             self.rs.to_binary_string(),
             self.rt.to_binary_string(),
             self.rd.to_binary_string(),
+            // `shamt` and `funct` are not used in the current processor.
             // shamt (5bit)
             binary_string(0 as u64, 5),
             // funct (6bit)
