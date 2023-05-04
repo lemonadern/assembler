@@ -13,7 +13,7 @@ use crate::{
 };
 
 fn main() -> anyhow::Result<()> {
-    let filename = "asm.txt";
+    let filename = "factasm.txt";
     let mut file =
         File::open(&filename).expect(format!("File `{}` is not Found.", &filename).as_str());
     let mut content = String::new();
@@ -29,13 +29,16 @@ fn main() -> anyhow::Result<()> {
 
     let base_address = 0;
 
+    let mut errors = vec![];
     let binaries: Vec<String> = instructions
         .iter()
         .enumerate()
-        .map(|(i, x)| parse_instruction(x, i, base_address, &label_map).unwrap())
+        .map(|(i, x)| parse_instruction(x, i, base_address, &label_map))
+        .filter_map(|r| r.map_err(|e| errors.push(e)).ok())
         .map(|x| x.encode_to_binary())
         .collect();
 
+    println!("{:#?}", errors);
     println!("{:#?}", binaries);
 
     let mut file = File::create("output.txt").expect("Failed to open file.");

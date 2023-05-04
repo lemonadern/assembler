@@ -296,7 +296,8 @@ pub fn parse_instruction(
             }))
         }
         _ => Err(anyhow!(
-            "Unsupported instruction encounted: `{}` is not supported.",
+            "Unsupported instruction encounted at index {:2}: `{}` is not supported.",
+            current_index,
             opcode
         )),
     }
