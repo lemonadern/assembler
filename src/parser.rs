@@ -34,9 +34,9 @@ mod remove_comment_tests {
 }
 
 type LabelMap = HashMap<String, usize>;
-type Operation = Vec<String>;
+type AssemblyInstruction = Vec<String>;
 
-pub fn parse_asm(input: &str) -> (Vec<Operation>, LabelMap) {
+pub fn parse_asm(input: &str) -> (Vec<AssemblyInstruction>, LabelMap) {
     let mut label_map = HashMap::new();
     let operations = input
         .lines()

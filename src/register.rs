@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 
-use crate::binary::to_padded_binary_string;
+use crate::binary::binary_string;
 
 #[derive(Clone, Debug)]
 pub struct Register {
@@ -15,8 +15,20 @@ impl Register {
         }
     }
 
-    pub fn to_binary_string(&self, width: usize) -> String {
-        to_padded_binary_string(self.id, width)
+    pub fn to_binary_string(&self) -> String {
+        // The registers in this processor are 5 bits.
+        binary_string(self.id, 5)
+    }
+}
+
+// better-way? This is an implementation for `rt` and `rd` when using the `jr` instruction.
+// This usecase may not be semantically desirable.
+impl Default for Register {
+    fn default() -> Self {
+        Self {
+            id: 0,
+            name: "$zero".to_string(),
+        }
     }
 }
 
