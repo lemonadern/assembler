@@ -191,7 +191,25 @@ pub fn parse_instruction(
             // (absolute address)
             //
             // Consider: labels
-            todo!()
+            // Assuming input only by label
+
+            let label = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("jal", "addr")))?;
+
+            let destination_index = label_map.get(label).ok_or_else(|| {
+                anyhow!(
+                    "The destination label `{}` for the instruction `jal` cannot be found.",
+                    &label
+                )
+            })?;
+
+            let addr = base_address + destination_index;
+
+            Ok(Box::new(JTypeInstruction {
+                opcode: Opcode::new(6, opcode),
+                addr,
+            }))
         }
         "jr" => {
             // 7: Jump Register
@@ -203,7 +221,7 @@ pub fn parse_instruction(
                 .try_into()?;
 
             Ok(Box::new(RTypeInstruction {
-                opcode: Opcode::new(0, opcode),
+                opcode: Opcode::new(7, opcode),
                 rs,
                 rt: Register::default(),
                 rd: Register::default(),
