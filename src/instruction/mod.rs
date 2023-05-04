@@ -1,13 +1,17 @@
 mod opcode;
 mod register;
 
-use crate::binary::binary_string;
+use crate::{binary::binary_string, parser::LabelMap};
 use anyhow::{anyhow, Ok, Result};
 use regex::Regex;
 
 use self::{opcode::Opcode, register::Register};
 
-pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>> {
+pub fn parse_instruction(
+    input: Vec<String>,
+    current_index: usize,
+    label_map: LabelMap,
+) -> Result<Box<dyn IntoBinaryFormat>> {
     let opcode = input.get(0).expect("Opcode is not found").as_str();
 
     match opcode {
@@ -112,7 +116,36 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
             // type I
             //
             // Consider: labels
-            todo!()
+
+            let rs: Register = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("beq", "rs")))?
+                .try_into()?;
+            let rt: Register = input
+                .get(2)
+                .ok_or_else(|| anyhow!(operand_missing_message("beq", "rt")))?
+                .try_into()?;
+
+            // Assuming input only by label
+            let label = input
+                .get(3)
+                .ok_or_else(|| anyhow!(operand_missing_message("beq", "addr")))?;
+
+            let destination_index = label_map.get(label).ok_or_else(|| {
+                anyhow!(
+                    "The destination label `{}` for the instruction `beq` cannot be found.",
+                    &label
+                )
+            })?;
+
+            let offset = *destination_index as isize - (current_index + 1) as isize;
+
+            Ok(Box::new(ITypeInstruction {
+                opcode: Opcode::new(4, opcode),
+                rs,
+                rt,
+                imm: offset,
+            }))
         }
         "j" => {
             // 5: Jump
@@ -120,6 +153,7 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
             // type J
             //
             // Consider: labels
+
             todo!()
         }
         "jal" => {
