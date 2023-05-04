@@ -6,29 +6,51 @@ use anyhow::{anyhow, Ok, Result};
 
 use self::{opcode::Opcode, register::Register};
 
-fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>> {
+pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>> {
     let opcode = input.get(0).expect("Opcode is not found").as_str();
 
     match opcode {
         "add" => {
             let rd: Register = input
                 .get(1)
-                .ok_or_else(|| anyhow!("Invalid operand for `add`: `rd` is missing"))?
+                .ok_or_else(|| anyhow!(operand_missing_message("add", "rd")))?
                 .try_into()?;
             let rs: Register = input
                 .get(2)
-                .ok_or_else(|| anyhow!("Invalid operand for `add`: `rs` is missing"))?
+                .ok_or_else(|| anyhow!(operand_missing_message("add", "rs")))?
                 .try_into()?;
             let rt: Register = input
                 .get(3)
-                .ok_or_else(|| anyhow!("Invalid operand for `add`: `rt` is missing"))?
+                .ok_or_else(|| anyhow!(operand_missing_message("add", "rt")))?
                 .try_into()?;
 
             Ok(Box::new(RTypeInstruction {
-                opcode: Opcode::new(0, "add"),
+                opcode: Opcode::new(0, opcode),
                 rs,
                 rt,
                 rd,
+            }))
+        }
+        "addi" => {
+            let rt: Register = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("addi", "rt")))?
+                .try_into()?;
+            let rs: Register = input
+                .get(2)
+                .ok_or_else(|| anyhow!(operand_missing_message("addi", "rs")))?
+                .try_into()?;
+
+            let imm: usize = input
+                .get(3)
+                .ok_or_else(|| anyhow!(operand_missing_message("addi", "imm")))?
+                .parse()?;
+
+            Ok(Box::new(ITypeInstruction {
+                opcode: Opcode::new(1, opcode),
+                rs,
+                rt,
+                imm,
             }))
         }
         // TODO: implement instructions
@@ -37,6 +59,13 @@ fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>> {
             opcode
         )),
     }
+}
+
+fn operand_missing_message(operation: &str, operand: &str) -> String {
+    format!(
+        "Invalid operand for `{}`: `{}` is missing",
+        operation, operand
+    )
 }
 
 trait IntoBinaryFormat {
