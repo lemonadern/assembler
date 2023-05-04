@@ -17,7 +17,7 @@ impl Register {
 
     pub fn to_binary_string(&self) -> String {
         // The registers in this processor are 5 bits.
-        binary_string(self.id, 5)
+        binary_string(self.id as u64, 5)
     }
 }
 

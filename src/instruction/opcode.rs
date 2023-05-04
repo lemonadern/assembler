@@ -15,6 +15,6 @@ impl Opcode {
 
     pub fn to_binary_string(&self) -> String {
         // nktk processor has 6-bit opcodes.
-        binary_string(self.id, 6)
+        binary_string(self.id as u64, 6)
     }
 }

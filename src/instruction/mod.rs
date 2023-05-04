@@ -41,7 +41,7 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
                 .ok_or_else(|| anyhow!(operand_missing_message("addi", "rs")))?
                 .try_into()?;
 
-            let imm: usize = input
+            let imm: isize = input
                 .get(3)
                 .ok_or_else(|| anyhow!(operand_missing_message("addi", "imm")))?
                 .parse()?;
@@ -89,9 +89,9 @@ impl IntoBinaryFormat for RTypeInstruction {
             self.rt.to_binary_string(),
             self.rd.to_binary_string(),
             // shamt (5bit)
-            binary_string(0, 5),
+            binary_string(0 as u64, 5),
             // funct (6bit)
-            binary_string(0, 6),
+            binary_string(0 as u64, 6),
         )
     }
 }
@@ -101,7 +101,7 @@ struct ITypeInstruction {
     pub opcode: Opcode,
     pub rs: Register,
     pub rt: Register,
-    pub imm: usize,
+    pub imm: isize,
 }
 
 impl IntoBinaryFormat for ITypeInstruction {
@@ -112,7 +112,7 @@ impl IntoBinaryFormat for ITypeInstruction {
             self.rs.to_binary_string(),
             self.rt.to_binary_string(),
             // 16bit imm/addr value
-            binary_string(self.imm, 16)
+            binary_string(self.imm as u64, 16)
         )
     }
 }
@@ -120,7 +120,7 @@ impl IntoBinaryFormat for ITypeInstruction {
 // J: jump type instruction
 struct JTypeInstruction {
     pub opcode: Opcode,
-    pub addr: usize,
+    pub addr: isize,
 }
 
 impl IntoBinaryFormat for JTypeInstruction {
@@ -129,7 +129,7 @@ impl IntoBinaryFormat for JTypeInstruction {
             "{}{}",
             self.opcode.to_binary_string(),
             // 26bit addr value
-            binary_string(self.addr, 26)
+            binary_string(self.addr as u64, 26)
         )
     }
 }
