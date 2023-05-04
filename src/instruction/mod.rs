@@ -7,7 +7,7 @@ use regex::Regex;
 
 use self::{opcode::Opcode, register::Register};
 
-trait IntoBinaryFormat {
+pub trait IntoBinaryFormat {
     fn encode_to_binary(&self) -> String;
 }
 
@@ -75,10 +75,10 @@ impl IntoBinaryFormat for JTypeInstruction {
 }
 
 pub fn parse_instruction(
-    input: Vec<String>,
+    input: &Vec<String>,
     current_index: usize,
     base_address: usize,
-    label_map: LabelMap,
+    label_map: &LabelMap,
 ) -> Result<Box<dyn IntoBinaryFormat>> {
     let opcode = input.get(0).expect("Opcode is not found").as_str();
 
@@ -166,7 +166,7 @@ pub fn parse_instruction(
                 .ok_or_else(|| anyhow!(operand_missing_message("sw", "rt")))?
                 .try_into()?;
             let second = input
-                .get(1)
+                .get(2)
                 .ok_or_else(|| anyhow!(operand_missing_message("sw", "addr(rs)")))?;
 
             let (addr, rs) = parse_addr_and_register(second)?;
