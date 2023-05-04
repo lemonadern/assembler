@@ -10,6 +10,7 @@ use self::{opcode::Opcode, register::Register};
 pub fn parse_instruction(
     input: Vec<String>,
     current_index: usize,
+    base_address: usize,
     label_map: LabelMap,
 ) -> Result<Box<dyn IntoBinaryFormat>> {
     let opcode = input.get(0).expect("Opcode is not found").as_str();
@@ -115,6 +116,10 @@ pub fn parse_instruction(
             // beq rs,rt,addr
             // type I
             //
+            // `if rs = rt then
+            //   pc <= pc4 + addr`
+            // (relative address)
+            //
             // Consider: labels
 
             let rs: Register = input
@@ -152,14 +157,38 @@ pub fn parse_instruction(
             // j addr
             // type J
             //
+            // `pc <= addr`
+            // (absolute address)
+            //
             // Consider: labels
 
-            todo!()
+            // Assuming input only by label
+            let label = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("j", "addr")))?;
+
+            let destination_index = label_map.get(label).ok_or_else(|| {
+                anyhow!(
+                    "The destination label `{}` for the instruction `j` cannot be found.",
+                    &label
+                )
+            })?;
+
+            let addr = base_address + destination_index;
+
+            Ok(Box::new(JTypeInstruction {
+                opcode: Opcode::new(5, opcode),
+                addr,
+            }))
         }
         "jal" => {
             // 6: Jump and Link
             // jal addr
             // type J
+            //
+            // `r31 <= pc4
+            //  pc <= addr`
+            // (absolute address)
             //
             // Consider: labels
             todo!()
@@ -258,7 +287,7 @@ impl IntoBinaryFormat for ITypeInstruction {
 // J: jump type instruction
 struct JTypeInstruction {
     pub opcode: Opcode,
-    pub addr: isize,
+    pub addr: usize,
 }
 
 impl IntoBinaryFormat for JTypeInstruction {
