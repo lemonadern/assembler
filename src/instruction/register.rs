@@ -83,3 +83,10 @@ impl TryFrom<&String> for Register {
         parse_register(value.as_str())
     }
 }
+
+impl TryFrom<String> for Register {
+    type Error = anyhow::Error;
+    fn try_from(value: String) -> std::result::Result<Self, Self::Error> {
+        parse_register(value.as_str())
+    }
+}

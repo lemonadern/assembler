@@ -3,6 +3,7 @@ mod register;
 
 use crate::binary::binary_string;
 use anyhow::{anyhow, Ok, Result};
+use regex::Regex;
 
 use self::{opcode::Opcode, register::Register};
 
@@ -65,7 +66,22 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
             // type I
             //
             // Consider: addr(rs)
-            todo!()
+            let rt: Register = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("lw", "rt")))?
+                .try_into()?;
+            let second = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("lw", "addr(rs)")))?;
+
+            let (addr, rs) = parse_addr_and_register(second)?;
+
+            Ok(Box::new(ITypeInstruction {
+                opcode: Opcode::new(2, opcode),
+                rs,
+                rt,
+                imm: addr,
+            }))
         }
         "sw" => {
             // 3: Store Word
@@ -127,6 +143,17 @@ fn operand_missing_message(operation: &str, operand: &str) -> String {
         "Invalid operand for `{}`: `{}` is missing",
         operation, operand
     )
+}
+
+fn parse_addr_and_register(input: &str) -> Result<(isize, Register)> {
+    let re = Regex::new(r"(-?\d+)\((.+)\)").expect("Failed to compile regular expression");
+    if let Some(captures) = re.captures(input) {
+        let addr = captures[1].parse()?;
+        let register: Register = captures[2].to_owned().try_into()?;
+        Ok((addr, register))
+    } else {
+        Err(anyhow!("Invalid operand format: {}", input))
+    }
 }
 
 trait IntoBinaryFormat {
