@@ -89,7 +89,22 @@ pub fn parse_instruction(input: Vec<String>) -> Result<Box<dyn IntoBinaryFormat>
             // type I
             //
             // Consider: addr(rs)
-            todo!()
+            let rt: Register = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("sw", "rt")))?
+                .try_into()?;
+            let second = input
+                .get(1)
+                .ok_or_else(|| anyhow!(operand_missing_message("sw", "addr(rs)")))?;
+
+            let (addr, rs) = parse_addr_and_register(second)?;
+
+            Ok(Box::new(ITypeInstruction {
+                opcode: Opcode::new(3, opcode),
+                rs,
+                rt,
+                imm: addr,
+            }))
         }
         "beq" => {
             // 4: Branch on Equal
