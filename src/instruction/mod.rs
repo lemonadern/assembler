@@ -81,6 +81,7 @@ pub fn parse_instruction(
     label_map: &LabelMap,
 ) -> Result<Box<dyn IntoBinaryFormat>> {
     let opcode = input.get(0).expect("Opcode is not found").as_str();
+    println!("{}: {}", &current_index, &opcode);
 
     match opcode {
         "add" => {
@@ -143,7 +144,7 @@ pub fn parse_instruction(
                 .ok_or_else(|| anyhow!(operand_missing_message("lw", "rt")))?
                 .try_into()?;
             let second = input
-                .get(1)
+                .get(2)
                 .ok_or_else(|| anyhow!(operand_missing_message("lw", "addr(rs)")))?;
 
             let (addr, rs) = parse_addr_and_register(second)?;
@@ -258,8 +259,8 @@ pub fn parse_instruction(
             // (absolute address)
             //
             // Consider: labels
-            // Assuming input only by label
 
+            // Assuming input only by label
             let label = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("jal", "addr")))?;

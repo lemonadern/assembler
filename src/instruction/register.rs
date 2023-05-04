@@ -35,7 +35,7 @@ impl Default for Register {
 
 fn parse_register(input: &str) -> Result<Register> {
     if !input.starts_with("$") {
-        return Err(anyhow!("Invalid Register format"));
+        return Err(anyhow!("Invalid Register format: {}", input));
     }
 
     match input {
