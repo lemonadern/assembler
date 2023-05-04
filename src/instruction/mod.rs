@@ -41,7 +41,7 @@ struct ITypeInstruction {
     pub opcode: Opcode,
     pub rs: Register,
     pub rt: Register,
-    pub imm: isize,
+    pub imm: u16,
 }
 
 impl IntoBinaryFormat for ITypeInstruction {
@@ -52,7 +52,7 @@ impl IntoBinaryFormat for ITypeInstruction {
             self.rs.to_binary_string(),
             self.rt.to_binary_string(),
             // 16bit imm/addr value
-            binary_string(self.imm as u64, 16)
+            binary_string(self.imm as u16, 16)
         )
     }
 }
@@ -120,7 +120,7 @@ pub fn parse_instruction(
                 .ok_or_else(|| anyhow!(operand_missing_message("addi", "rs")))?
                 .try_into()?;
 
-            let imm: isize = input
+            let imm: i16 = input
                 .get(3)
                 .ok_or_else(|| anyhow!(operand_missing_message("addi", "imm")))?
                 .parse()?;
@@ -129,7 +129,7 @@ pub fn parse_instruction(
                 opcode: Opcode::new(1, opcode),
                 rs,
                 rt,
-                imm,
+                imm: imm as u16,
             }))
         }
         "lw" => {
@@ -152,7 +152,7 @@ pub fn parse_instruction(
                 opcode: Opcode::new(2, opcode),
                 rs,
                 rt,
-                imm: addr,
+                imm: addr as u16,
             }))
         }
         "sw" => {
@@ -175,7 +175,7 @@ pub fn parse_instruction(
                 opcode: Opcode::new(3, opcode),
                 rs,
                 rt,
-                imm: addr,
+                imm: addr as u16,
             }))
         }
         "beq" => {
@@ -210,13 +210,13 @@ pub fn parse_instruction(
                 )
             })?;
 
-            let offset = *destination_index as isize - (current_index + 1) as isize;
+            let offset = *destination_index as i16 - (current_index + 1) as i16;
 
             Ok(Box::new(ITypeInstruction {
                 opcode: Opcode::new(4, opcode),
                 rs,
                 rt,
-                imm: offset,
+                imm: offset as u16,
             }))
         }
         "j" => {
@@ -308,7 +308,7 @@ fn operand_missing_message(operation: &str, operand: &str) -> String {
     )
 }
 
-fn parse_addr_and_register(input: &str) -> Result<(isize, Register)> {
+fn parse_addr_and_register(input: &str) -> Result<(i16, Register)> {
     let re = Regex::new(r"(-?\d+)\((.+)\)").expect("Failed to compile regular expression");
     if let Some(captures) = re.captures(input) {
         let addr = captures[1].parse()?;

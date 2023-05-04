@@ -5,6 +5,7 @@ use crate::binary::binary_string;
 #[derive(Clone, Debug)]
 pub struct Register {
     id: usize,
+    #[allow(dead_code)]
     name: String,
 }
 impl Register {

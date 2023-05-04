@@ -2,6 +2,7 @@ use crate::binary::binary_string;
 
 pub struct Opcode {
     id: usize,
+    #[allow(dead_code)]
     name: String,
 }
 
