@@ -7,6 +7,73 @@ use regex::Regex;
 
 use self::{opcode::Opcode, register::Register};
 
+trait IntoBinaryFormat {
+    fn encode_to_binary(&self) -> String;
+}
+
+// R: register type instruction
+struct RTypeInstruction {
+    pub opcode: Opcode,
+    pub rs: Register,
+    pub rt: Register,
+    pub rd: Register,
+}
+
+impl IntoBinaryFormat for RTypeInstruction {
+    fn encode_to_binary(&self) -> String {
+        format!(
+            "{}{}{}{}{}{}",
+            self.opcode.to_binary_string(),
+            self.rs.to_binary_string(),
+            self.rt.to_binary_string(),
+            self.rd.to_binary_string(),
+            // `shamt` and `funct` are not used in the current processor.
+            // shamt (5bit)
+            binary_string(0 as u64, 5),
+            // funct (6bit)
+            binary_string(0 as u64, 6),
+        )
+    }
+}
+
+// I: immidiate type instruction
+struct ITypeInstruction {
+    pub opcode: Opcode,
+    pub rs: Register,
+    pub rt: Register,
+    pub imm: isize,
+}
+
+impl IntoBinaryFormat for ITypeInstruction {
+    fn encode_to_binary(&self) -> String {
+        format!(
+            "{}{}{}{}",
+            self.opcode.to_binary_string(),
+            self.rs.to_binary_string(),
+            self.rt.to_binary_string(),
+            // 16bit imm/addr value
+            binary_string(self.imm as u64, 16)
+        )
+    }
+}
+
+// J: jump type instruction
+struct JTypeInstruction {
+    pub opcode: Opcode,
+    pub addr: usize,
+}
+
+impl IntoBinaryFormat for JTypeInstruction {
+    fn encode_to_binary(&self) -> String {
+        format!(
+            "{}{}",
+            self.opcode.to_binary_string(),
+            // 26bit addr value
+            binary_string(self.addr as u64, 26)
+        )
+    }
+}
+
 pub fn parse_instruction(
     input: Vec<String>,
     current_index: usize,
@@ -249,72 +316,5 @@ fn parse_addr_and_register(input: &str) -> Result<(isize, Register)> {
         Ok((addr, register))
     } else {
         Err(anyhow!("Invalid operand format: {}", input))
-    }
-}
-
-trait IntoBinaryFormat {
-    fn encode_to_binary(&self) -> String;
-}
-
-// R: register type instruction
-struct RTypeInstruction {
-    pub opcode: Opcode,
-    pub rs: Register,
-    pub rt: Register,
-    pub rd: Register,
-}
-
-impl IntoBinaryFormat for RTypeInstruction {
-    fn encode_to_binary(&self) -> String {
-        format!(
-            "{}{}{}{}{}{}",
-            self.opcode.to_binary_string(),
-            self.rs.to_binary_string(),
-            self.rt.to_binary_string(),
-            self.rd.to_binary_string(),
-            // `shamt` and `funct` are not used in the current processor.
-            // shamt (5bit)
-            binary_string(0 as u64, 5),
-            // funct (6bit)
-            binary_string(0 as u64, 6),
-        )
-    }
-}
-
-// I: immidiate type instruction
-struct ITypeInstruction {
-    pub opcode: Opcode,
-    pub rs: Register,
-    pub rt: Register,
-    pub imm: isize,
-}
-
-impl IntoBinaryFormat for ITypeInstruction {
-    fn encode_to_binary(&self) -> String {
-        format!(
-            "{}{}{}{}",
-            self.opcode.to_binary_string(),
-            self.rs.to_binary_string(),
-            self.rt.to_binary_string(),
-            // 16bit imm/addr value
-            binary_string(self.imm as u64, 16)
-        )
-    }
-}
-
-// J: jump type instruction
-struct JTypeInstruction {
-    pub opcode: Opcode,
-    pub addr: usize,
-}
-
-impl IntoBinaryFormat for JTypeInstruction {
-    fn encode_to_binary(&self) -> String {
-        format!(
-            "{}{}",
-            self.opcode.to_binary_string(),
-            // 26bit addr value
-            binary_string(self.addr as u64, 26)
-        )
     }
 }
