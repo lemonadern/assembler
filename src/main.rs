@@ -1,79 +1,53 @@
-use std::collections::HashMap;
+use anyhow::{anyhow, Ok, Result};
 
-fn remove_comments(input: &str) -> String {
-    let mut output = String::new();
-    let mut lines = input.lines();
+mod binary;
+mod parser;
+mod register;
 
-    while let Some(line) = lines.next() {
-        if let Some(pos) = line.find('#') {
-            output.push_str(&line[..pos]);
-            if pos != 0 {
-                output.push('\n');
-            }
-        } else {
-            output.push_str(line);
-            output.push('\n');
-        }
-    }
-
-    output
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_remove_comments() {
-        let input =
-            "Hello, world!\nRust\n# This is a comment\nAnother line.\nHi, #this is comment, too.\n";
-        let expected = "Hello, world!\nRust\nAnother line.\nHi, \n";
-        let actual = remove_comments(input);
-        assert_eq!(actual, expected);
-    }
-}
+use crate::binary::to_padded_binary_string;
+use crate::parser::{parse_asm, remove_comments};
+use crate::register::Register;
 
 fn main() {
     let input = "addi    $sp,    $sp,    -4\n main : sw      $ra,    0($sp)";
-    let converted = parse_asm(input);
-    println!("{:?}", converted);
+    let (operations, label_map) = parse_asm(&remove_comments(input));
+
+    println!("{:?}", &operations);
+    println!("{:?}", &label_map);
 }
 
-type LabelMap = HashMap<String, usize>;
 type Operation = Vec<String>;
 
-fn parse_asm(input: &str) -> (Vec<Operation>, LabelMap) {
-    let mut label_map = HashMap::new();
-    let operations = input
-        .lines()
-        // Trim whitespaces and remove empty lines
-        .filter_map(|line| {
-            let text = line.trim();
-            if text.is_empty() {
-                None
-            } else {
-                Some(text)
-            }
-        })
-        .enumerate()
-        .map(|(i, text)| {
-            // Read labels and set them in the label_map
-            // Convert to an operation iterator
-            if let Some((label, operation)) = text.split_once(":") {
-                label_map.insert(label.trim().to_owned(), i);
-                operation
-            } else {
-                text
-            }
-        })
-        .map(|s| {
-            // Split the operation
-            s.split(|c: char| c == ',' || c.is_whitespace())
-                .filter(|s| !s.trim().is_empty())
-                .map(|s| s.trim().to_owned())
-                .collect()
-        })
-        .collect();
+fn to_binary_string(operation: Operation) -> Result<String> {
+    let opcode = operation.get(0).expect("Opcode is not found").as_str();
 
-    (operations, label_map)
+    match opcode {
+        "add" => {
+            let rd: Register = operation
+                .get(1)
+                .ok_or_else(|| anyhow!("Invalid operand for `add`: `rd` is missing"))?
+                .try_into()?;
+            let rs: Register = operation
+                .get(2)
+                .ok_or_else(|| anyhow!("Invalid operand for `add`: `rs` is missing"))?
+                .try_into()?;
+            let rt: Register = operation
+                .get(3)
+                .ok_or_else(|| anyhow!("Invalid operand for `add`: `rt` is missing"))?
+                .try_into()?;
+            // TODO: change to binary
+            Ok(format!(
+                "add: {}, rs: {}, rt: {}, rd: {}",
+                to_padded_binary_string(0, 6), // `add` operation number is 0
+                rs.to_binary_string(5),
+                rt.to_binary_string(5),
+                rd.to_binary_string(5)
+            ))
+        }
+        // TODO: implement operations
+        _ => Err(anyhow!(
+            "Unsupported Operation encounted: `{}` is not supported.",
+            opcode
+        )),
+    }
 }
