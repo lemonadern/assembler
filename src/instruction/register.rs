@@ -8,6 +8,7 @@ pub struct Register {
     #[allow(dead_code)]
     name: String,
 }
+
 impl Register {
     pub fn new(id: usize, name: &str) -> Self {
         Register {
@@ -89,5 +90,48 @@ impl TryFrom<String> for Register {
     type Error = anyhow::Error;
     fn try_from(value: String) -> std::result::Result<Self, Self::Error> {
         parse_register(value.as_str())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn fail_to_parse_strings_without_dollar_prefix() {
+        let r = parse_register("sp");
+
+        match r {
+            core::result::Result::Ok(_) => {
+                panic!("Expected an error, but got a successful result.")
+            }
+            Err(err) => {
+                let error_message = format!("{}", err);
+                assert!(
+                    error_message.contains("Invalid Register format"),
+                    "Error message does not contain expected text: {}",
+                    error_message
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn fail_to_parse_unsupported_register_name() {
+        let r = parse_register("$unsupported");
+
+        match r {
+            core::result::Result::Ok(_) => {
+                panic!("Expected an error, but got a successful result.")
+            }
+            Err(err) => {
+                let error_message = format!("{}", err);
+                assert!(
+                    error_message.contains("Unsupported register"),
+                    "Error message does not contain expected text: {}",
+                    error_message
+                );
+            }
+        }
     }
 }
