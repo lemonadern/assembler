@@ -22,16 +22,16 @@ struct RTypeInstruction {
 impl IntoBinaryFormat for RTypeInstruction {
     fn encode_to_binary(&self) -> String {
         format!(
-            "{}{}{}{}{}{}",
-            self.opcode.to_binary_string(),
-            self.rs.to_binary_string(),
-            self.rt.to_binary_string(),
-            self.rd.to_binary_string(),
+            "{opcode}{rs}{rt}{rd}{shamt}{funct}",
+            opcode = self.opcode.to_binary_string(),
+            rs = self.rs.to_binary_string(),
+            rt = self.rt.to_binary_string(),
+            rd = self.rd.to_binary_string(),
             // `shamt` and `funct` are not used in the current processor.
             // shamt (5bit)
-            binary_string(0 as u64, 5),
+            shamt = binary_string(0 as u64, 5),
             // funct (6bit)
-            binary_string(0 as u64, 6),
+            funct = binary_string(0 as u64, 6),
         )
     }
 }
@@ -47,12 +47,12 @@ struct ITypeInstruction {
 impl IntoBinaryFormat for ITypeInstruction {
     fn encode_to_binary(&self) -> String {
         format!(
-            "{}{}{}{}",
-            self.opcode.to_binary_string(),
-            self.rs.to_binary_string(),
-            self.rt.to_binary_string(),
+            "{opcode}{rs}{rt}{imm_or_addr}",
+            opcode = self.opcode.to_binary_string(),
+            rs = self.rs.to_binary_string(),
+            rt = self.rt.to_binary_string(),
             // 16bit imm/addr value
-            binary_string(self.imm as u16, 16)
+            imm_or_addr = binary_string(self.imm as u16, 16)
         )
     }
 }
@@ -66,10 +66,10 @@ struct JTypeInstruction {
 impl IntoBinaryFormat for JTypeInstruction {
     fn encode_to_binary(&self) -> String {
         format!(
-            "{}{}",
-            self.opcode.to_binary_string(),
+            "{opcode}{addr}",
+            opcode = self.opcode.to_binary_string(),
             // 26bit addr value
-            binary_string(self.addr as u64, 26)
+            addr = binary_string(self.addr as u64, 26)
         )
     }
 }
