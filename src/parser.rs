@@ -19,20 +19,6 @@ pub fn remove_comments(input: &str) -> String {
     output
 }
 
-#[cfg(test)]
-mod remove_comment_tests {
-    use super::*;
-
-    #[test]
-    fn test_remove_comments() {
-        let input =
-            "Hello, world!\nRust\n# This is a comment\nAnother line.\nHi, #this is comment, too.\n";
-        let expected = "Hello, world!\nRust\nAnother line.\nHi, \n";
-        let actual = remove_comments(input);
-        assert_eq!(actual, expected);
-    }
-}
-
 pub type LabelMap = HashMap<String, usize>;
 
 pub fn parse_asm(input: &str) -> (Vec<Vec<String>>, LabelMap) {

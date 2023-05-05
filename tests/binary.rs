@@ -17,7 +17,7 @@ fn opcodes() {
     // 6-bit value
     assert_eq!(binary_string(0 as u16, 6), "000000");
     assert_eq!(binary_string(8 as u16, 6), "001000");
-    assert_eq!(binary_string(64 as u16, 6), "111111");
+    assert_eq!(binary_string(63 as u16, 6), "111111");
 }
 
 #[test]
