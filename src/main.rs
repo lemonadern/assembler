@@ -34,7 +34,8 @@ fn main() -> anyhow::Result<()> {
         .iter()
         .enumerate()
         .map(|(i, x)| parse_instruction(x, i, base_address, &label_map))
-        .filter_map(|r| r.map_err(|e| errors.push(e)).ok())
+        .enumerate()
+        .filter_map(|(i, r)| r.map_err(|e| errors.push((i, e))).ok())
         .map(|x| x.encode_to_binary())
         .collect();
 

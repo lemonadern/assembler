@@ -81,7 +81,6 @@ pub fn parse_instruction(
     label_map: &LabelMap,
 ) -> Result<Box<dyn IntoBinaryFormat>> {
     let opcode = input.get(0).expect("Opcode is not found").as_str();
-    println!("{}: {}", &current_index, &opcode);
 
     match opcode {
         "add" => {
@@ -283,6 +282,11 @@ pub fn parse_instruction(
             // 7: Jump Register
             // jr rs
             // type R
+
+            if input.len() > 2 {
+                return Err(anyhow!(too_many_operand_message("jr", current_index)));
+            }
+
             let rs: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("jr", "rs")))?
@@ -296,11 +300,14 @@ pub fn parse_instruction(
             }))
         }
         _ => Err(anyhow!(
-            "Unsupported instruction encounted at index {:2}: `{}` is not supported.",
-            current_index,
+            "Unsupported instruction encounted: `{}` is not supported.",
             opcode
         )),
     }
+}
+
+fn too_many_operand_message(operation: &str, index: usize) -> String {
+    format!("Too many operand for `{}` at {}", operation, index)
 }
 
 fn operand_missing_message(operation: &str, operand: &str) -> String {
@@ -317,6 +324,9 @@ fn parse_addr_and_register(input: &str) -> Result<(i16, Register)> {
         let register: Register = captures[2].to_owned().try_into()?;
         Ok((addr, register))
     } else {
-        Err(anyhow!("Invalid operand format: {}", input))
+        Err(anyhow!(
+            "Invalid operand format: expecting `addr($register)` but found `{}`",
+            input
+        ))
     }
 }
