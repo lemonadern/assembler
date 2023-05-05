@@ -87,6 +87,11 @@ pub fn parse_instruction(
             // 0: Add
             // add rd,rs,rt
             // type R
+
+            if input.len() > 4 {
+                return Err(anyhow!(too_many_operand_message("add", current_index)));
+            }
+
             let rd: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("add", "rd")))?
@@ -111,6 +116,11 @@ pub fn parse_instruction(
             // 1: Add Immidiate
             // addi rt,rs,imm
             // type I
+
+            if input.len() > 4 {
+                return Err(anyhow!(too_many_operand_message("addi", current_index)));
+            }
+
             let rt: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("addi", "rt")))?
@@ -138,6 +148,11 @@ pub fn parse_instruction(
             // type I
             //
             // Consider: addr(rs)
+
+            if input.len() > 3 {
+                return Err(anyhow!(too_many_operand_message("lw", current_index)));
+            }
+
             let rt: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("lw", "rt")))?
@@ -161,6 +176,11 @@ pub fn parse_instruction(
             // type I
             //
             // Consider: addr(rs)
+
+            if input.len() > 3 {
+                return Err(anyhow!(too_many_operand_message("sw", current_index)));
+            }
+
             let rt: Register = input
                 .get(1)
                 .ok_or_else(|| anyhow!(operand_missing_message("sw", "rt")))?
@@ -188,6 +208,10 @@ pub fn parse_instruction(
             // (relative address)
             //
             // Consider: labels
+
+            if input.len() > 4 {
+                return Err(anyhow!(too_many_operand_message("beq", current_index)));
+            }
 
             let rs: Register = input
                 .get(1)
@@ -229,6 +253,10 @@ pub fn parse_instruction(
             //
             // Consider: labels
 
+            if input.len() > 2 {
+                return Err(anyhow!(too_many_operand_message("j", current_index)));
+            }
+
             // Assuming input only by label
             let label = input
                 .get(1)
@@ -258,6 +286,10 @@ pub fn parse_instruction(
             // (absolute address)
             //
             // Consider: labels
+
+            if input.len() > 2 {
+                return Err(anyhow!(too_many_operand_message("jal", current_index)));
+            }
 
             // Assuming input only by label
             let label = input
