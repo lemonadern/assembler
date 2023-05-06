@@ -332,6 +332,8 @@ pub fn parse_instruction(
             }))
         }
         s @ _ => {
+            // Although such conditional branching is not desirable,
+            // but I have adopted this ad-hoc implementation because there are no plans to extend the assembly language that this assembler interprets.
             if s.starts_with('.') {
                 return Err(anyhow!(
                     "Found `{}`, but Directives are not supported in this assembler.",
