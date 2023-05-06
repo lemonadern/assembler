@@ -2,6 +2,36 @@
 
 Assembler for nktk-architecture computer.
 
+## How to use
+
+### Assembling
+
+1. Clone this repository.
+2. Execute `cargo run <input_file>`
+
+```
+git clone https://github.com/lemonadern/assembler.git
+cargo r input.asm
+```
+
+### help command
+
+By executing `cargo run -- --help`, you can see the usage instructions for the
+command.
+
+```
+Usage: assembler [OPTIONS] <INPUT_FILE>
+
+Arguments:
+  <INPUT_FILE>  Input file path
+
+Options:
+  -b, --base-address <BASE_ADDRESS>  Address for first instruction [default: 0]
+  -o, --output <FILE>                Output file [default: output.txt]
+  -h, --help                         Print help
+  -V, --version                      Print version
+```
+
 ## Instructions
 
 | Numbering | Name | Assembly format    | Status |
@@ -17,7 +47,40 @@ Assembler for nktk-architecture computer.
 
 ## レジスタ
 
-32個すべて利用可能
+| Register Name | Status |
+| ------------- | ------ |
+| `$0`, `$zero` | ✅     |
+| `$1`, `$at`   | ✅     |
+| `$2`, `$v0`   | ✅     |
+| `$3`, `$v1`   | ✅     |
+| `$4`, `$a0`   | ✅     |
+| `$5`, `$a1`   | ✅     |
+| `$6`, `$a2`   | ✅     |
+| `$7`, `$a3`   | ✅     |
+| `$8`, `$t0`   | ✅     |
+| `$9`, `$t1`   | ✅     |
+| `$10`, `$t2`  | ✅     |
+| `$11`, `$t3`  | ✅     |
+| `$12`, `$t4`  | ✅     |
+| `$13`, `$t5`  | ✅     |
+| `$14`, `$t6`  | ✅     |
+| `$15`, `$t7`  | ✅     |
+| `$16`, `$s0`  | ✅     |
+| `$17`, `$s1`  | ✅     |
+| `$18`, `$s2`  | ✅     |
+| `$19`, `$s3`  | ✅     |
+| `$20`, `$s4`  | ✅     |
+| `$21`, `$s5`  | ✅     |
+| `$22`, `$s6`  | ✅     |
+| `$23`, `$s7`  | ✅     |
+| `$24`, `$t8`  | ✅     |
+| `$25`, `$t9`  | ✅     |
+| `$26`, `$k0`  | ✅     |
+| `$27`, `$k1`  | ✅     |
+| `$28`, `$gp`  | ✅     |
+| `$29`, `$sp`  | ✅     |
+| `$30`, `$fp`  | ✅     |
+| `$31`, `$ra`  | ✅     |
 
 ## アセンブリ言語について
 
