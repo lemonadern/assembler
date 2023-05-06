@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 pub fn remove_comments(input: &str) -> String {
     let mut output = String::new();
-    let mut lines = input.lines();
 
-    while let Some(line) = lines.next() {
+    for line in input.lines() {
         if let Some(pos) = line.find('#') {
             output.push_str(&line[..pos]);
             if pos != 0 {
@@ -38,7 +37,7 @@ pub fn parse_asm(input: &str) -> (Vec<Vec<String>>, LabelMap) {
         .map(|(i, text)| {
             // Read labels and set them in the label_map
             // Convert to an operation iterator
-            if let Some((label, operation)) = text.split_once(":") {
+            if let Some((label, operation)) = text.split_once(':') {
                 label_map.insert(label.trim().to_owned(), i);
                 operation
             } else {

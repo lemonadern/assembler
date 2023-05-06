@@ -2,19 +2,19 @@
 
 #[test]
 fn twos_complements() {
-    let i = 0 as i16;
-    let u = 0 as u16;
+    let i = 0_i16;
+    let u = 0_u16;
     assert_eq!(i as u16, u);
 
-    let i = -1 as i16;
-    let u = 65535 as u16;
+    let i = -1_i16;
+    let u = 65535_u16;
     assert_eq!(i as u16, u);
 
-    let i = 32767 as i16;
-    let u = 32767 as u16;
+    let i = 32767_i16;
+    let u = 32767_u16;
     assert_eq!(i as u16, u);
 
-    let i = -32768 as i16;
-    let u = 32768 as u16;
+    let i = -32768_i16;
+    let u = 32768_u16;
     assert_eq!(i as u16, u);
 }
