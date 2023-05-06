@@ -1,12 +1,15 @@
 mod binary;
+mod cli;
 mod instruction;
 mod parser;
 
 use std::{
-    env,
     fs::File,
     io::{Read, Write},
 };
+
+use clap::Parser;
+use cli::Cli;
 
 use crate::{
     instruction::parse_instruction,
@@ -14,17 +17,21 @@ use crate::{
 };
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        eprintln!("Usage: cargo r <file_path>");
-        return;
-    }
+    let args = Cli::parse();
 
-    let input_path = &args[1];
-    let mut file = match File::open(input_path) {
+    let input_path = args.input_file;
+    let base_address = args.base_address; // Default: 0
+    let output = &args.output; // Default: "output.txt"
+
+    let mut file = match File::open(&input_path) {
         Ok(file) => file,
         Err(error) => {
-            eprintln!("Error opening file {}: {}", input_path, error);
+            eprintln!(
+                "Error opening file {}: {}",
+                // TODO: fix me?
+                input_path.display(),
+                error
+            );
             return;
         }
     };
@@ -33,18 +40,15 @@ fn main() {
     match file.read_to_string(&mut content) {
         Ok(_) => {}
         Err(error) => {
-            eprintln!("Error reading `{}`: {}", input_path, error);
+            eprintln!("Error reading `{}`: {}", input_path.display(), error);
             return;
         }
     }
 
     let (instructions, label_map) = parse_asm(&remove_comments(content.as_str()));
 
-    // println!("{:#?}", &instructions);
-    // println!("{:#?}", &label_map);
-
-    // TODO: base_address も何らかの形で受け取るようにする
-    let base_address = 0;
+    // // println!("{:#?}", &instructions);
+    // // println!("{:#?}", &label_map);
 
     let mut errors = Vec::new();
     let binaries: Vec<String> = instructions
@@ -56,22 +60,21 @@ fn main() {
         .map(|x| x.encode_to_binary())
         .collect();
 
-    // println!("{:#?}", errors);
-    // println!("{:#?}", binaries);
+    // // println!("{:#?}", errors);
+    // // println!("{:#?}", binaries);
 
     if !errors.is_empty() {
         eprintln!("Error occured while assembling.");
-        println!("");
+        println!();
         println!("Found Errors:");
         for (index, error) in errors {
             println!("  At index {:3}, {}", index, error);
         }
-        println!("");
+        println!();
         return;
     }
 
-    // TODO: output のファイル名指定もできるようにしたい
-    let mut file = match File::create("output.txt") {
+    let mut file = match File::create(output) {
         Ok(file) => file,
         Err(error) => {
             eprintln!("Failed to open file: {}", error);
