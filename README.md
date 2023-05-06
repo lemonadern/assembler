@@ -10,8 +10,8 @@ Assembler for nktk-architecture computer.
 |--|----| --------------- |--|
 |0|add|`add rd, rs, rt`| ✅ |
 |1|addi|`addi rt, rs, imm`| ✅ |
-|2|lw|`lw rt, rs, addr`| ✅ |
-|3|sw|`sw rt, rs, addr`| ✅ |
+|2|lw|`lw rt, addr(rs)`| ✅ |
+|3|sw|`sw rt, addr(rs)`| ✅ |
 |4|beq|`beq rs, rt, addr`| ✅ |
 |5|j|`j addr`| ✅ |
 |6|jal|`jal addr`| ✅ |
@@ -27,7 +27,6 @@ Assembler for nktk-architecture computer.
 
 このアセンブラが解釈するアセンブリ言語は、（一般的なアセンブリ言語に比べて）限られた機能しか持ちません。また、パースの作業を簡略なものにするために、非常に限定された文法のみをサポートしています。
 
-​	
 
 ### 機能
 
@@ -40,11 +39,14 @@ Assembler for nktk-architecture computer.
 
 ### 文法
 
-BNF書こうと思ったんですが面倒なのでやめます。説明から感じ取ってください
+BNF書こうと思ったんですが面倒なのでやめます。説明から感じ取って理解してください
 
 - 1行につき1命令
-- ラベルは行頭に書いて、命令との間に `:` を置く
+- ラベルを書く場合は行頭に書いて、命令との間に `:` を置く
 - `#`による一行コメントが書ける
+- コメントのみの行も可
+- 空行も可
+
 
 以下に例を示します：
 
@@ -53,7 +55,11 @@ label:  addi    $sp,    $sp,    -4
         sw      $ra,    0($sp)          # comment
 ```
 
+### 注意点
 
+その他の制約など
+
+- `beq`, `j`,`jal` 命令におけるオペランド`addr` は、ラベル指定による入力のみを受け付けます
 
 
 
