@@ -29,9 +29,9 @@ impl IntoBinaryFormat for RTypeInstruction {
             rd = self.rd.to_binary_string(),
             // `shamt` and `funct` are not used in the current processor.
             // shamt (5bit)
-            shamt = binary_string(0 as u64, 5),
+            shamt = binary_string(0_u64, 5),
             // funct (6bit)
-            funct = binary_string(0 as u64, 6),
+            funct = binary_string(0_u64, 6),
         )
     }
 }
@@ -52,7 +52,7 @@ impl IntoBinaryFormat for ITypeInstruction {
             rs = self.rs.to_binary_string(),
             rt = self.rt.to_binary_string(),
             // 16bit imm/addr value
-            imm_or_addr = binary_string(self.imm as u16, 16)
+            imm_or_addr = binary_string(self.imm, 16)
         )
     }
 }

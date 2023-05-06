@@ -15,7 +15,7 @@ use crate::{
 fn main() -> anyhow::Result<()> {
     let filename = "factasm.txt";
     let mut file =
-        File::open(&filename).expect(format!("File `{}` is not Found.", &filename).as_str());
+        File::open(filename).unwrap_or_else(|_| panic!("File `{}` is not Found.", &filename));
     let mut content = String::new();
 
     file.read_to_string(&mut content)
