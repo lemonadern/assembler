@@ -2,14 +2,18 @@
 // add rd,rs,rt
 // type R
 
+mod common;
+
 use std::collections::HashMap;
 
-use assembler::{instruction::parse_instruction, parser::parse_asm};
+use assembler::instruction::parse_instruction;
+
+use crate::common::convert_to_string_vec;
 
 #[test]
 fn happy() {
-    let (instructions, label_map) = parse_asm("add $zero, $zero, $zero");
-    let result = parse_instruction(instructions.get(0).unwrap(), 0, 0, &label_map);
+    let input = convert_to_string_vec(vec!["add", "$zero", "$zero", "$zero"]);
+    let result = parse_instruction(&input, 0, 0, &HashMap::new());
 
     let actual = result.unwrap().encode_to_binary();
 
@@ -43,8 +47,4 @@ fn fail_on_invalid_register() {
     let input = convert_to_string_vec(vec!["add", "$zero", "$zero", "$hello"]);
     let result = parse_instruction(&input, 0, 0, &HashMap::new());
     assert!(result.is_err())
-}
-
-fn convert_to_string_vec(str_vec: Vec<&str>) -> Vec<String> {
-    str_vec.iter().map(|s| s.to_string()).collect()
 }
