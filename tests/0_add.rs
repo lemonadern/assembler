@@ -1,8 +1,6 @@
-// Invalid Format
-// - オペランド過多
-// - オペランド不足
-// - レジスタに即値を渡す
-// - 不正なレジスタ
+// 0: Add
+// add rd,rs,rt
+// type R
 
 use std::collections::HashMap;
 
