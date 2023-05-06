@@ -3,6 +3,7 @@ mod instruction;
 mod parser;
 
 use std::{
+    env,
     fs::File,
     io::{Read, Write},
 };
@@ -12,24 +13,40 @@ use crate::{
     parser::{parse_asm, remove_comments},
 };
 
-fn main() -> anyhow::Result<()> {
-    let filename = "factasm.txt";
-    let mut file =
-        File::open(filename).unwrap_or_else(|_| panic!("File `{}` is not Found.", &filename));
-    let mut content = String::new();
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        eprintln!("Usage: cargo r <file_path>");
+        return;
+    }
 
-    file.read_to_string(&mut content)
-        .expect("something went wrong reading the file");
-    // println!("File: {}", content);
+    let input_path = &args[1];
+    let mut file = match File::open(input_path) {
+        Ok(file) => file,
+        Err(error) => {
+            eprintln!("Error opening file {}: {}", input_path, error);
+            return;
+        }
+    };
+
+    let mut content = String::new();
+    match file.read_to_string(&mut content) {
+        Ok(_) => {}
+        Err(error) => {
+            eprintln!("Error reading `{}`: {}", input_path, error);
+            return;
+        }
+    }
 
     let (instructions, label_map) = parse_asm(&remove_comments(content.as_str()));
 
     // println!("{:#?}", &instructions);
-    println!("{:#?}", &label_map);
+    // println!("{:#?}", &label_map);
 
+    // TODO: base_address も何らかの形で受け取るようにする
     let base_address = 0;
 
-    let mut errors = vec![];
+    let mut errors = Vec::new();
     let binaries: Vec<String> = instructions
         .iter()
         .enumerate()
@@ -39,11 +56,39 @@ fn main() -> anyhow::Result<()> {
         .map(|x| x.encode_to_binary())
         .collect();
 
-    println!("{:#?}", errors);
-    println!("{:#?}", binaries);
+    // println!("{:#?}", errors);
+    // println!("{:#?}", binaries);
 
-    let mut file = File::create("output.txt").expect("Failed to open file.");
-    write!(file, "{}", binaries.join("\n"))?;
-    file.flush()?;
-    Ok(())
+    if !errors.is_empty() {
+        eprintln!("Error occured while assembling.");
+        println!("");
+        println!("Found Errors:");
+        for (index, error) in errors {
+            println!("  At index {:3}, {}", index, error);
+        }
+        println!("");
+        return;
+    }
+
+    // TODO: output のファイル名指定もできるようにしたい
+    let mut file = match File::create("output.txt") {
+        Ok(file) => file,
+        Err(error) => {
+            eprintln!("Failed to open file: {}", error);
+            return;
+        }
+    };
+
+    let content = binaries.join("\n");
+    if let Err(error) = write!(file, "{}", content) {
+        eprintln!("Failed to write to file: {}", error);
+        return;
+    }
+
+    if let Err(error) = file.flush() {
+        eprintln!("Failed to flush file: {}", error);
+        return;
+    }
+
+    println!("Assembling completed.")
 }
