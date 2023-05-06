@@ -331,10 +331,19 @@ pub fn parse_instruction(
                 rd: Register::default(),
             }))
         }
-        _ => Err(anyhow!(
-            "Unsupported instruction encounted: `{}` is not supported.",
-            opcode
-        )),
+        s @ _ => {
+            if s.starts_with('.') {
+                return Err(anyhow!(
+                    "Found `{}`, but Directives are not supported in this assembler.",
+                    s
+                ));
+            }
+
+            Err(anyhow!(
+                "Unsupported instruction encounted: `{}` is not supported.",
+                opcode
+            ))
+        }
     }
 }
 
