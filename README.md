@@ -1,6 +1,6 @@
 # Assembler
 
-Assembler for nktk-architecture computer.
+Assembler for nktk-architecture processor/computer.
 
 ## How to use
 

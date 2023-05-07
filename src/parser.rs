@@ -24,7 +24,7 @@ pub fn parse_asm(input: &str) -> (Vec<Vec<String>>, LabelMap) {
     let mut label_map = HashMap::new();
     let operations = input
         .lines()
-        // Trim whitespaces and remove empty lines
+        // Trim whitespace and remove empty lines
         .filter_map(|line| {
             let text = line.trim();
             if text.is_empty() {

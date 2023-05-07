@@ -26,12 +26,7 @@ fn main() {
     let mut file = match File::open(&input_path) {
         Ok(file) => file,
         Err(error) => {
-            eprintln!(
-                "Error opening file {}: {}",
-                // TODO: fix me?
-                input_path.display(),
-                error
-            );
+            eprintln!("Error opening file {}: {}", input_path.display(), error);
             return;
         }
     };
@@ -64,7 +59,7 @@ fn main() {
     // // println!("{:#?}", binaries);
 
     if !errors.is_empty() {
-        eprintln!("Error occured while assembling.");
+        eprintln!("Error occurred while assembling.");
         println!();
         println!("Found Errors:");
         for (index, error) in errors {

@@ -36,7 +36,7 @@ impl IntoBinaryFormat for RTypeInstruction {
     }
 }
 
-// I: immidiate type instruction
+// I: immediate type instruction
 struct ITypeInstruction {
     pub opcode: Opcode,
     pub rs: Register,
@@ -113,7 +113,7 @@ pub fn parse_instruction(
             }))
         }
         "addi" => {
-            // 1: Add Immidiate
+            // 1: Add Immediate
             // addi rt,rs,imm
             // type I
 
@@ -342,7 +342,7 @@ pub fn parse_instruction(
             }
 
             Err(anyhow!(
-                "Unsupported instruction encounted: `{}` is not supported.",
+                "Unsupported instruction encountered: `{}` is not supported.",
                 opcode
             ))
         }

@@ -1,4 +1,4 @@
-// 1: Add Immidiate
+// 1: Add Immediate
 // addi rt,rs,imm
 // type I
 

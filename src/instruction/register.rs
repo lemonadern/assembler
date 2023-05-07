@@ -24,7 +24,7 @@ impl Register {
 }
 
 // better-way? This is an implementation for `rt` and `rd` when using the `jr` instruction.
-// This usecase may not be semantically desirable.
+// This use case may not be semantically desirable.
 impl Default for Register {
     fn default() -> Self {
         Self {
@@ -73,7 +73,7 @@ fn parse_register(input: &str) -> Result<Register> {
         "$30" | "$fp" => Ok(Register::new(30, "fp")),
         "$31" | "$ra" => Ok(Register::new(31, "ra")),
         _ => Err(anyhow!(
-            "Unsupported register encounted: `{}` is not supported.",
+            "Unsupported register encountered: `{}` is not supported.",
             input
         )),
     }
