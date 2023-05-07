@@ -27,11 +27,11 @@ fn positive_pc_relative_addressing() {
     let bin = results.nth(0).unwrap().unwrap().encode_to_binary();
 
     assert_eq!(bin.len(), 32);
-    //                 000100 (4: beq)
-    //                 |    |10001 (17: $s1)
-    //                 |    ||   |10010 (18: $s2)
-    //                 |    ||   ||   |0000000000000010 (2: LABEL_address(3) - beq_address(0) - 1)
-    //                 |    ||   ||   ||              |
+    //               000100 (4: beq)
+    //               |    |10001 (17: $s1)
+    //               |    ||   |10010 (18: $s2)
+    //               |    ||   ||   |0000000000000010 (2: LABEL_address(3) - beq_address(0) - 1)
+    //               |    ||   ||   ||              |
     assert_eq!(bin, "00010010001100100000000000000010");
 }
 
