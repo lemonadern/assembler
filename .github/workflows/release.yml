@@ -1,27 +1,73 @@
+name: Build and Release
+
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v[0-9].[0-9]+.[0-9]+"'
+  workflow_dispatch:
 
 jobs:
-  release:
-    name: release ${{ matrix.target }}
-    runs-on: ubuntu-latest
+  build-and-release:
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - target: x86_64-pc-windows-gnu
-            archive: zip
-          - target: x86_64-unknown-linux-musl
-            archive: tar.gz tar.xz tar.zst
-          - target: x86_64-apple-darwin
-            archive: zip
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            ext: ''
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: .exe
     steps:
-      - uses: actions/checkout@master
-      - name: Compile and release
-        uses: rust-build/rust-build.action@v1.4.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          RUSTTARGET: ${{ matrix.target }}
-          ARCHIVE_TYPES: ${{ matrix.archive }}
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: Build Release
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --target ${{ matrix.target }}
+      env:
+        CARGO_TERM_COLOR: always
+        RUSTFLAGS: -C target-cpu=native
+      if: matrix.os == 'ubuntu-latest'
+
+    - name: Build Release (Windows)
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --target ${{ matrix.target }}
+      env:
+        CARGO_TERM_COLOR: always
+      if: matrix.os == 'windows-latest'
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_url.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/target/${{ matrix.target }}/release/assembly{{ matrix.ext }}
+        asset_name: your_binary_name-${{ matrix.os }}${{ matrix.ext }}
+        asset_content_type: application/octet-stream
+      if: matrix.os == 'ubuntu-latest'
+
+    - name: Upload Release Asset (Windows)
+      id: upload-release-asset-windows
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_url.outputs.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}\target\${{ matrix.target }}\release\assembly${{ matrix.ext }}
+        asset_name: your_binary_name-${{ matrix.os }}${{ matrix.ext }}
+        asset_content_type: application/octet-stream
+      if: matrix.os == 'windows-latest'
