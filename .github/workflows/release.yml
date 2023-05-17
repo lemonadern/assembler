@@ -15,19 +15,19 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             artifact_name: assembler
-            asset_name: example-x86_64-unknown-linux-gnu
+            asset_name: assembler-x86_64-unknown-linux-gnu
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             artifact_name: assembler
-            asset_name: example-x86_64-unknown-linux-musl
+            asset_name: assembler-x86_64-unknown-linux-musl
           - os: ubuntu-latest
             target: x86_64-pc-windows-gnu
             artifact_name: assembler.exe
-            asset_name: example-x86_64-pc-windows-gnu.exe
+            asset_name: assembler-x86_64-pc-windows-gnu.exe
           - os: macos-latest
             target: x86_64-apple-darwin
             artifact_name: assembler
-            asset_name: example-x86_64-apple-darwin
+            asset_name: assembler-x86_64-apple-darwin
 
 
     runs-on: ${{ matrix.os }}
